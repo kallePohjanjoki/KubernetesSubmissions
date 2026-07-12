@@ -14,4 +14,7 @@ spec:
     spec:
       containers:
         - name: logoutput
-          image: kallepohjanjoki/log_output:v1
+          image: kallepohjanjoki/log_output:v1.2
+          env:
+             - name: PORT
+               value: "8080"
