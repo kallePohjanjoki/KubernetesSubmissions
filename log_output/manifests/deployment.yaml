@@ -12,9 +12,20 @@ spec:
       labels:
         app: logoutput
     spec:
+      volumes: # Define volume
+        - name: shared-log
+          emptyDir: {}
       containers:
-        - name: logoutput
-          image: kallepohjanjoki/log_output:v1.2
+        - name: logoutput-reader
+          image: kallepohjanjoki/log_output-reader:v1
           env:
-             - name: PORT
-               value: "8080"
+               - name: PORT
+                 value: "8080"
+          volumeMounts: # Mount volume
+          - name: shared-log
+            mountPath: /shared/
+        - name: image-response
+          image: kallepohjanjoki/log_output-writer:v1
+          volumeMounts: # Mount volume
+          - name: shared-log
+            mountPath: /shared/
