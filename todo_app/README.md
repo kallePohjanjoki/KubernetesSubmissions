@@ -1,3 +1,3 @@
 ## Todo app
 
-Deploy with `kubectl apply -f manifests/deployment.yaml` and `kubectl port-forward todoapp-dep-54bc4bd6d5-pznxz 8000:8000`
+Deploy with `k3d cluster create --port 8082:30080@agent:0 -p 8081:80@loadbalancer --agents 2` and `kubectl apply -f manifests/`
