@@ -14,4 +14,7 @@ spec:
     spec:
       containers:
         - name: todoapp
-          image: kallepohjanjoki/todo_app:v1.1
+          image: kallepohjanjoki/todo_app:v1.3
+          env:
+             - name: PORT
+               value: "8000"
