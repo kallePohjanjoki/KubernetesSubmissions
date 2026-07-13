@@ -12,9 +12,16 @@ spec:
       labels:
         app: todoapp
     spec:
+      volumes:
+        - name: image-cache
+          persistentVolumeClaim:
+            claimName: todoapp-claim
       containers:
         - name: todoapp
-          image: kallepohjanjoki/todo_app:v1.3
+          image: kallepohjanjoki/todo_app:v1.4
           env:
-             - name: PORT
-               value: "8000"
+            - name: PORT
+              value: "8000"
+          volumeMounts:
+            - name: image-cache
+              mountPath: /images/
