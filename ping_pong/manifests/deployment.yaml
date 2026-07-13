@@ -12,9 +12,16 @@ spec:
       labels:
         app: pingpong
     spec:
+      volumes:
+        - name: pingpong-data
+          persistentVolumeClaim:
+            claimName: log-claim
       containers:
         - name: pingpong
-          image: kallepohjanjoki/pingpong:v1
+          image: kallepohjanjoki/pingpong:v1.1
           env:
-             - name: PORT
-               value: "8080"
+            - name: PORT
+              value: "8080"
+          volumeMounts:
+            - name: pingpong-data
+              mountPath: /shared/
