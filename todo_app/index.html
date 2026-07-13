@@ -1,10 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Todo App</title>
+    <title>Todo App</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-	<h1>Todo App</h1>
-	<img src="data:image/jpeg;base64,{{.ImageBase64}}" alt="Random picture" width="600" />
+    <h1>Todo App</h1>
+    <img src="data:image/jpeg;base64,{{.ImageBase64}}" alt="Random picture" width="600" />
+
+    <form id="todo-form">
+        <input
+            type="text"
+            id="todo-input"
+            placeholder="Enter a new todo (max 140 characters)"
+            maxlength="140"
+            required
+        />
+        <button type="submit" id="todo-submit">Send</button>
+    </form>
+
+    <h2>Todos</h2>
+    <ul id="todo-list">
+        <li>Learn Kubernetes basics</li>
+        <li>Deploy application to cluster</li>
+        <li>Configure persistent volumes</li>
+    </ul>
+
+    <script>
+        document.getElementById("todo-form").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+        });
+    </script>
 </body>
 </html>
