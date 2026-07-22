@@ -9,30 +9,15 @@ import (
 	"sync"
 )
 
-var mu sync.Mutex
-
-func readCounter(path string) int {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return 0
-	}
-	n, err := strconv.Atoi(string(data))
-	if err != nil {
-		return 0
-	}
-	return n
-}
-
-func writeCounter(path string, n int) error {
-	return os.WriteFile(path, []byte(strconv.Itoa(n)), 0644)
-}
+var (
+	counter int
+	mu      sync.Mutex
+)
 
 func main() {
 	port := os.Getenv("PORT")
-
-	filePath := os.Getenv("FILE_PATH")
-	if filePath == "" {
-		filePath = "/shared/pingpong_counter.txt"
+	if port == "" {
+		port = "3000"
 	}
 
 	http.HandleFunc("/pingpong", func(w http.ResponseWriter, r *http.Request) {
@@ -42,15 +27,24 @@ func main() {
 		}
 
 		mu.Lock()
-		current := readCounter(filePath)
-		if err := writeCounter(filePath, current+1); err != nil {
-			mu.Unlock()
-			http.Error(w, "Failed to write counter", http.StatusInternalServerError)
-			return
-		}
+		current := counter
+		counter++
 		mu.Unlock()
 
 		fmt.Fprintf(w, "pong %d\n", current)
+	})
+
+	http.HandleFunc("/pings", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		mu.Lock()
+		current := counter
+		mu.Unlock()
+
+		fmt.Fprint(w, strconv.Itoa(current))
 	})
 
 	if err := http.ListenAndServe(":"+port, nil); err != nil {

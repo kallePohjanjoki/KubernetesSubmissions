@@ -15,20 +15,15 @@ spec:
       volumes: # Define volume
         - name: shared-log
           emptyDir: {}
-        - name: pingpong-data
-          persistentVolumeClaim:
-              claimName: log-claim
       containers:
         - name: logoutput-reader
-          image: kallepohjanjoki/log_output-reader:v1.1
+          image: kallepohjanjoki/log_output-reader:v1.4
           env:
             - name: PORT
               value: "8080"
           volumeMounts: # Mount volume
             - name: shared-log
               mountPath: /shared/
-            - name: pingpong-data
-              mountPath: /pingpong-data/
         - name: image-response
           image: kallepohjanjoki/log_output-writer:v1
           volumeMounts: # Mount volume
