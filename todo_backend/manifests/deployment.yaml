@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todobackend-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todobackend
+  template:
+    metadata:
+      labels:
+        app: todobackend
+    spec:
+      containers:
+        - name: todobackend
+          image: kallepohjanjoki/todo_backend:v1
+          env:
+            - name: PORT
+              value: "8080"

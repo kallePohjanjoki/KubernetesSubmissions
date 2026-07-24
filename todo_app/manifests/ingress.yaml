@@ -13,3 +13,11 @@ spec:
             name: todoapp-svc
             port:
               number: 2346
+
+      - path: /todos
+        pathType: Prefix
+        backend:
+          service:
+            name: todobackend-svc
+            port:
+              number: 2345

@@ -20,6 +20,3 @@
 
 ### Chapter 3
 - [2.1.](https://github.com/kallePohjanjoki/KubernetesSubmissions/tree/2.1/log_output)
-
-
-

@@ -21,15 +21,29 @@
 
     <h2>Todos</h2>
     <ul id="todo-list">
-        <li>Learn Kubernetes basics</li>
-        <li>Deploy application to cluster</li>
-        <li>Configure persistent volumes</li>
+        {{range .Todos}}
+        <li>{{.Content}}</li>
+        {{end}}
     </ul>
 
     <script>
-        document.getElementById("todo-form").addEventListener("submit", function (e) {
+        document.getElementById("todo-form").addEventListener("submit", async function (e) {
             e.preventDefault();
+            const input = document.getElementById("todo-input");
+            const content = input.value.trim();
+            if (!content) return;
 
+            const res = await fetch("/todos", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ content: content }),
+            });
+
+            if (res.ok) {
+                location.reload();
+            } else {
+                alert("Failed to add todo");
+            }
         });
     </script>
 </body>

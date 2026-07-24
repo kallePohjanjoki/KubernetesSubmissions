@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
@@ -18,6 +19,15 @@ var (
 	imageMu    sync.Mutex
 	refreshing bool
 )
+
+var httpClient = &http.Client{
+	Timeout: 2 * time.Second,
+}
+
+type Todo struct {
+	ID      int    `json:"id"`
+	Content string `json:"content"`
+}
 
 func imagePath() string {
 	p := "/images/image.jpg"
@@ -75,6 +85,20 @@ func refreshInBackground(path string) {
 	}()
 }
 
+func fetchTodos() ([]Todo, error) {
+	resp, err := httpClient.Get("http://todobackend-svc:2345/todos")
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var todos []Todo
+	if err := json.NewDecoder(resp.Body).Decode(&todos); err != nil {
+		return nil, err
+	}
+	return todos, nil
+}
+
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -104,6 +128,12 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	todos, err := fetchTodos()
+	if err != nil {
+		log.Printf("failed to fetch todos: %v", err)
+		todos = []Todo{}
+	}
+
 	tmpl, err := template.ParseFiles("index.html")
 	if err != nil {
 		http.Error(w, "Internal error", http.StatusInternalServerError)
@@ -112,8 +142,10 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 	data := struct {
 		ImageBase64 string
+		Todos       []Todo
 	}{
 		ImageBase64: base64.StdEncoding.EncodeToString(imageBytes),
+		Todos:       todos,
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -124,6 +156,9 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
 
 	http.HandleFunc("/", indexHandler)
 
