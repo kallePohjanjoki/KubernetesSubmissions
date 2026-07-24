@@ -9,6 +9,7 @@ spec:
       app: logoutput
   template:
     metadata:
+      namespace: exercises
       labels:
         app: logoutput
     spec:

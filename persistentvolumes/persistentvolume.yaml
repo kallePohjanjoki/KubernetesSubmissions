@@ -1,6 +1,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
+  namespace: exercises
   name: logoutput-pv
 spec:
   storageClassName: logoutput-pv # this is the name you are using later to claim this volume
