@@ -1,6 +1,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
+  namespace: project
   name: todoapp-image-pv
 spec:
   storageClassName: todoapp-image-pv
