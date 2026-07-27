@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: logoutput-dep
+  namespace: exercises
 spec:
   replicas: 1
   selector:
@@ -9,24 +10,33 @@ spec:
       app: logoutput
   template:
     metadata:
-      namespace: exercises
       labels:
         app: logoutput
     spec:
-      volumes: # Define volume
+      volumes:
         - name: shared-log
           emptyDir: {}
+        - name: config-volume
+          configMap:
+            name: logoutput-config
       containers:
         - name: logoutput-reader
-          image: kallepohjanjoki/log_output-reader:v1.4
+          image: kallepohjanjoki/log_output-reader:v1.5
           env:
             - name: PORT
               value: "8080"
-          volumeMounts: # Mount volume
+            - name: MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: logoutput-config
+                  key: MESSAGE
+          volumeMounts:
             - name: shared-log
               mountPath: /shared/
+            - name: config-volume
+              mountPath: /config/
         - name: image-response
           image: kallepohjanjoki/log_output-writer:v1
-          volumeMounts: # Mount volume
+          volumeMounts:
             - name: shared-log
               mountPath: /shared/

@@ -18,6 +18,7 @@ func main() {
 	port := os.Getenv("PORT")
 
 	statusFilePath := "/shared/status.txt"
+	infoFilePath := "/config/information.txt"
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		statusContent, err := os.ReadFile(statusFilePath)
@@ -38,7 +39,20 @@ func main() {
 			log.Printf("failed to reach ping-pong app: %v", err)
 		}
 
+		fileContent, err := os.ReadFile(infoFilePath)
+		fileText := "not available"
+		if err == nil {
+			fileText = strings.TrimSpace(string(fileContent))
+		} else {
+			log.Printf("failed to read info file: %v", err)
+		}
+
+		message := os.Getenv("MESSAGE")
+
 		line := strings.TrimRight(string(statusContent), "\n")
+
+		fmt.Fprintf(w, "file content: %s\n", fileText)
+		fmt.Fprintf(w, "env variable: MESSAGE=%s\n", message)
 		fmt.Fprintf(w, "%s. Ping / Pongs: %s\n", line, counterValue)
 	})
 
