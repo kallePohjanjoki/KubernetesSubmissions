@@ -19,10 +19,16 @@ spec:
             claimName: todoapp-claim
       containers:
         - name: todoapp
-          image: kallepohjanjoki/todo_app:v1.6
+          image: kallepohjanjoki/todo_app:v1.7
           env:
             - name: PORT
               value: "8000"
+            - name: IMAGE_PATH
+              value: "/images/image.jpg"
+            - name: IMAGE_SOURCE_URL
+              value: "https://picsum.photos/1200"
+            - name: TODO_BACKEND_URL
+              value: "http://todobackend-svc:2345/todos"
           volumeMounts:
             - name: image-cache
               mountPath: /images/

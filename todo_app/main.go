@@ -30,14 +30,16 @@ type Todo struct {
 }
 
 func imagePath() string {
-	p := "/images/image.jpg"
+	p := os.Getenv("IMAGE_PATH")
 
 	return p
 }
 
 // fetchAndSaveImage downloads a fresh image from Lorem Picsum and writes it to disk.
 func fetchAndSaveImage(path string) error {
-	resp, err := http.Get("https://picsum.photos/1200")
+	imageSourceURL := os.Getenv("IMAGE_SOURCE_URL")
+	resp, err := http.Get(imageSourceURL)
+
 	if err != nil {
 		return err
 	}
@@ -86,7 +88,13 @@ func refreshInBackground(path string) {
 }
 
 func fetchTodos() ([]Todo, error) {
-	resp, err := httpClient.Get("http://todobackend-svc:2345/todos")
+	todoBackendURL := os.Getenv("TODO_BACKEND_URL")
+	if todoBackendURL == "" {
+		todoBackendURL = "http://todobackend-svc:2345/todos"
+	}
+
+	resp, err := httpClient.Get(todoBackendURL)
+
 	if err != nil {
 		return nil, err
 	}
