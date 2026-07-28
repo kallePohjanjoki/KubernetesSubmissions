@@ -15,7 +15,32 @@ spec:
     spec:
       containers:
         - name: todobackend
-          image: kallepohjanjoki/todo_backend:v1
+          image: kallepohjanjoki/todo_backend:v1.1
           env:
             - name: PORT
               value: "8080"
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-postgres-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-postgres-config
+                  key: DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-postgres-config
+                  key: POSTGRES_DB
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: todo-postgres-secret
+                  key: POSTGRES_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: todo-postgres-secret
+                  key: POSTGRES_PASSWORD
