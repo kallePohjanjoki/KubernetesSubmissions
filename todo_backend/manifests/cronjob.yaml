@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: random-wikipedia-todo
+  namespace: project
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: random-wikipedia-todo
+              image: curlimages/curl:8.10.1
+              command:
+                - sh
+                - -c
+                - |
+                  URL=$(curl -sI https://en.wikipedia.org/wiki/Special:Random | grep -i "^location:" | tr -d '\r' | awk '{print $2}')
+
+                  if [ -z "$URL" ]; then
+                    echo "Failed to get random Wikipedia URL"
+                    exit 1
+                  fi
+
+                  echo "Got URL: $URL"
+
+                  curl -s -X POST http://todobackend-svc:2345/todos \
+                    -H "Content-Type: application/json" \
+                    -d "{\"content\":\"Read $URL\"}"
+          restartPolicy: OnFailure
