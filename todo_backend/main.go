@@ -64,8 +64,11 @@ func ensureSchema(db *sql.DB) error {
 func todosHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
+		log.Printf("GET /todos from %s", r.RemoteAddr)
+
 		rows, err := db.Query("SELECT id, content FROM todos ORDER BY id")
 		if err != nil {
+			log.Printf("GET /todos failed: database error: %v", err)
 			http.Error(w, "Database error", http.StatusInternalServerError)
 			return
 		}
@@ -75,6 +78,7 @@ func todosHandler(w http.ResponseWriter, r *http.Request) {
 		for rows.Next() {
 			var t Todo
 			if err := rows.Scan(&t.ID, &t.Content); err != nil {
+				log.Printf("GET /todos failed: scan error: %v", err)
 				http.Error(w, "Database error", http.StatusInternalServerError)
 				return
 			}
@@ -89,16 +93,24 @@ func todosHandler(w http.ResponseWriter, r *http.Request) {
 			Content string `json:"content"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			log.Printf("POST /todos rejected: invalid JSON body: %v", err)
 			http.Error(w, "Invalid JSON body", http.StatusBadRequest)
 			return
 		}
 
 		content := strings.TrimSpace(body.Content)
+
 		if content == "" {
+			log.Printf("POST /todos rejected: empty content")
 			http.Error(w, "Content cannot be empty", http.StatusBadRequest)
 			return
 		}
+
 		if len(content) > 140 {
+			log.Printf(
+				"POST /todos rejected: content too long (%d characters): %q",
+				len(content), truncateForLog(content, 60),
+			)
 			http.Error(w, "Content must be 140 characters or fewer", http.StatusBadRequest)
 			return
 		}
@@ -109,17 +121,28 @@ func todosHandler(w http.ResponseWriter, r *http.Request) {
 			content,
 		).Scan(&newTodo.ID, &newTodo.Content)
 		if err != nil {
+			log.Printf("POST /todos failed: database error: %v", err)
 			http.Error(w, "Database error", http.StatusInternalServerError)
 			return
 		}
+
+		log.Printf("POST /todos accepted: id=%d content=%q", newTodo.ID, newTodo.Content)
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(newTodo)
 
 	default:
+		log.Printf("%s /todos rejected: method not allowed", r.Method)
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
+}
+
+func truncateForLog(s string, max int) string {
+	if len(s) <= max {
+		return s
+	}
+	return s[:max] + "..."
 }
 
 func main() {
@@ -135,6 +158,8 @@ func main() {
 	}
 
 	port := os.Getenv("PORT")
+
+	log.Printf("todo-backend starting on port %s", port)
 
 	http.HandleFunc("/todos", todosHandler)
 
