@@ -81,14 +81,9 @@ func main() {
 		port = "3000"
 	}
 
-	// Health check endpoint - GKE Ingress checks "/" by default
-	// regardless of which path the Service is actually mapped to.
+	// The app now owns "/" directly - the Gateway rewrites
+	// /pingpong -> / before the request ever reaches this pod.
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, "ok")
-	})
-
-	http.HandleFunc("/pingpong", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
@@ -108,6 +103,8 @@ func main() {
 		fmt.Fprintf(w, "pong %d\n", previous)
 	})
 
+	// Internal-only endpoint, called directly pod-to-pod by
+	// log-output. Not exposed through the Gateway at all.
 	http.HandleFunc("/pings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
