@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: pingpong
-          image: kallepohjanjoki/pingpong:v1.3
+          image: kallepohjanjoki/pingpong:v1.4
           env:
             - name: PORT
               value: "8080"
