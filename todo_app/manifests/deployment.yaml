@@ -19,7 +19,7 @@ spec:
             claimName: todoapp-claim
       containers:
         - name: todoapp
-          image: kallepohjanjoki/todo_app:v1.7
+          image: PROJECT/TODOAPP
           env:
             - name: PORT
               value: "8000"

@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: todobackend
-          image: kallepohjanjoki/todo_backend:v1.2
+          image: PROJECT/TODOBACKEND
           env:
             - name: PORT
               value: "8080"
