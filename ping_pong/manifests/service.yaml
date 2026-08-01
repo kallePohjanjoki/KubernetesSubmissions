@@ -2,12 +2,12 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: exercises
-  name: pingpong-svc
+  name: seedimage-svc
 spec:
-  type: ClusterIP
+  type: LoadBalancer # This should be the only unfamiliar part
   selector:
-    app: pingpong
+    app: seedimage
   ports:
-    - port: 2347
+    - port: 80
       protocol: TCP
-      targetPort: 8080
+      targetPort: 3000
