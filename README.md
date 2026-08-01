@@ -33,4 +33,5 @@
 
 ### Chapter 4
 
-- [3.1.](https://github.com/kallePohjanjoki/KubernetesSubmissions/tree/2.11/ping_pong)
+- [3.1.](https://github.com/kallePohjanjoki/KubernetesSubmissions/tree/3.1/ping_pong)
+- [3.2.](https://github.com/kallePohjanjoki/KubernetesSubmissions/tree/3.2/log_output)
